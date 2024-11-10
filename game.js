@@ -26,68 +26,21 @@ let enemyImgLoaded = false;
 playerImg.onload = () => { playerImgLoaded = true; };
 enemyImg.onload = () => { enemyImgLoaded = true; };
 
-// 언어 데이터
-const messages = {
-    en: {
-        attack: "You attack the enemy for {damage} damage!",
-        defend: "You prepare to defend the next attack!",
-        talk: ["The enemy seems hesitant.", "The enemy ignores you.", "The enemy appears confused."],
-        itemUsed: "You use a healing item and restore 20 HP.",
-        noItems: "No items left!",
-        enemyAttack: "The enemy attacks you for {damage} damage!",
-        enemyDefend: "The enemy is watching you carefully...",
-        playerDefend: "The enemy attacks, but you defend and take only {damage} damage!",
-        victory: "You defeated the enemy!",
-        defeat: "You have been defeated...",
-        levelUp: "You leveled up! Now at level {level}."
-    },
-    ko: {
-        attack: "적에게 {damage}의 피해를 입혔습니다!",
-        defend: "다음 공격을 방어할 준비를 합니다!",
-        talk: ["적이 주저하는 것 같습니다.", "적이 당신을 무시합니다.", "적이 혼란스러워 보입니다."],
-        itemUsed: "회복 아이템을 사용하여 체력이 20 회복되었습니다.",
-        noItems: "아이템이 없습니다!",
-        enemyAttack: "적이 당신에게 {damage}의 피해를 입혔습니다!",
-        enemyDefend: "적이 다음 공격을 준비하는 것 같습니다...",
-        playerDefend: "적이 공격했지만, 방어하여 {damage}의 피해만 입었습니다!",
-        victory: "적을 처치했습니다!",
-        defeat: "패배하였습니다...",
-        levelUp: "레벨이 올랐습니다! 현재 레벨: {level}."
-    }
-};
-
-// 현재 언어 설정
-let currentLanguage = "en";
-
-// 언어 변경 함수
-function setLanguage(lang) {
-    currentLanguage = lang;
-    updateStats();
-}
-
-// 메시지 출력 함수
-function displayMessage(message, params = {}) {
-    let msg = messages[currentLanguage][message];
-    if (Array.isArray(msg)) {
-        msg = msg[Math.floor(Math.random() * msg.length)];
-    }
-    for (const key in params) {
-        msg = msg.replace(`{${key}}`, params[key]);
-    }
-    document.getElementById("message").textContent = msg;
-}
-
 function updateStats() {
     document.getElementById("playerHp").textContent = playerHp;
     document.getElementById("playerLevel").textContent = playerLevel;
     document.getElementById("enemyHp").textContent = enemyHp;
 }
 
+function displayMessage(message) {
+    document.getElementById("message").textContent = message;
+}
+
 function attack() {
     if (isPlayerTurn) {
         const damage = Math.floor(Math.random() * 10) + 5;
         enemyHp -= damage;
-        displayMessage("attack", { damage });
+        displayMessage(`적에게 ${damage}의 피해를 입혔습니다!`);
         isPlayerTurn = false;
         checkGameOver();
         setTimeout(enemyTurn, 1000);
@@ -96,7 +49,7 @@ function attack() {
 
 function defend() {
     if (isPlayerTurn) {
-        displayMessage("defend");
+        displayMessage("다음 공격을 방어할 준비를 합니다!");
         playerDefense = true;
         isPlayerTurn = false;
         setTimeout(enemyTurn, 1000);
@@ -105,10 +58,15 @@ function defend() {
 
 function talk() {
     if (isPlayerTurn) {
-        displayMessage("talk");
+        displayMessage("적에게 말을 걸어봅니다...");
         const response = Math.random();
         if (response < 0.3) {
+            displayMessage("적이 주저하는 것 같습니다.");
             enemyHp -= 5; // 대화로 적에게 약간의 피해를 줌
+        } else if (response < 0.6) {
+            displayMessage("적이 당신을 무시합니다.");
+        } else {
+            displayMessage("적이 혼란스러워 보입니다.");
         }
         isPlayerTurn = false;
         checkGameOver();
@@ -120,12 +78,12 @@ function useItem() {
     if (isPlayerTurn && items > 0) {
         playerHp = Math.min(playerHp + 20, 100);  // HP 최대치를 넘지 않도록
         items--;
-        displayMessage("itemUsed");
+        displayMessage("회복 아이템을 사용하여 체력이 20 회복되었습니다.");
         updateStats();
         isPlayerTurn = false;
         setTimeout(enemyTurn, 1000);
     } else if (items <= 0) {
-        displayMessage("noItems");
+        displayMessage("아이템이 없습니다!");
     }
 }
 
@@ -137,13 +95,13 @@ function enemyTurn() {
             if (playerDefense) {
                 damage = Math.floor(damage / 2);  // 방어 시 피해 반감
                 playerDefense = false;
-                displayMessage("playerDefend", { damage });
+                displayMessage(`적이 공격했지만, 방어하여 ${damage}의 피해만 입었습니다!`);
             } else {
-                displayMessage("enemyAttack", { damage });
+                displayMessage(`적이 당신에게 ${damage}의 피해를 입혔습니다!`);
             }
             playerHp -= damage;
         } else {
-            displayMessage("enemyDefend");
+            displayMessage("적이 다음 공격을 준비하는 것 같습니다...");
         }
         checkGameOver();
     }
@@ -153,10 +111,10 @@ function enemyTurn() {
 function checkGameOver() {
     updateStats();
     if (playerHp <= 0) {
-        displayMessage("defeat");
+        displayMessage("패배하였습니다...");
         disableActions();
     } else if (enemyHp <= 0) {
-        displayMessage("victory");
+        displayMessage("적을 처치했습니다!");
         gainExp();
     }
 }
@@ -174,7 +132,7 @@ function gainExp() {
         playerExp = 0;
         playerHp = Math.min(playerHp + 20, 100); // 레벨업 시 체력 회복
         enemyHp = 50 + playerLevel * 10;  // 새로운 적 체력 증가
-        displayMessage("levelUp", { level: playerLevel });
+        displayMessage(`레벨이 올랐습니다! 현재 레벨: ${playerLevel}`);
         updateStats();
         isPlayerTurn = true;
     }
