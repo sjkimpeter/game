@@ -129,6 +129,13 @@ function startEncounter(enemy) {
     enemyLevel = enemy.level;
     enemyHp = enemy.hp;
     enemyImg.src = enemy.img;
+    enemyImg.onload = () => {
+        enemyImgLoaded = true;
+        drawCharacters();
+    };
+    enemyImg.onerror = () => {
+        enemyImgLoaded = false;
+    };
     updateStats();
 }
 
@@ -138,6 +145,7 @@ function solvePuzzle() {
     if (success) {
         enemyHp -= 20;
         displayMessage("puzzleSuccess");
+        checkGameOver();
     } else {
         displayMessage("puzzleFail");
         enemyTurn();
@@ -149,12 +157,29 @@ function attack() {
         const damage = Math.floor(Math.random() * 10) + 5;
         enemyHp -= damage;
         displayMessage("attack", { damage, enemy: enemyName });
+        animateAttack();
         isPlayerTurn = false;
-        checkGameOver();
         setTimeout(() => {
+            checkGameOver();
             if (enemyHp > 0) enemyTurn();
         }, 1000);
     }
+}
+
+function animateAttack() {
+    const originalX = playerPosition.x;
+    let offset = 0;
+    const attackAnimation = setInterval(() => {
+        playerPosition.x = originalX + offset;
+        offset = offset === 0 ? 10 : 0;
+        drawCharacters();
+    }, 50);
+
+    setTimeout(() => {
+        clearInterval(attackAnimation);
+        playerPosition.x = originalX;
+        drawCharacters();
+    }, 500);
 }
 
 function checkGameOver() {
@@ -193,6 +218,30 @@ function updateStats() {
     document.getElementById("enemyName").textContent = enemyName;
 }
 
+function drawCharacters() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (playerImgLoaded) {
+        ctx.drawImage(playerImg, playerPosition.x, playerPosition.y, 64, 64);
+    } else {
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(playerPosition.x, playerPosition.y, 64, 64);
+    }
+
+    if (enemyImgLoaded) {
+        ctx.drawImage(enemyImg, enemyPosition.x, enemyPosition.y, 64, 64);
+    } else {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(enemyPosition.x, enemyPosition.y, 64, 64);
+    }
+}
+
+function gameLoop() {
+    drawCharacters();
+    requestAnimationFrame(gameLoop);
+}
+
 // 게임 시작
 updateStats();
 displayStory();
+gameLoop();
