@@ -19,24 +19,21 @@ const playerImg = new Image();
 playerImg.src = "images/player.png";
 const slimeImg = new Image();
 slimeImg.src = "images/slime.png";
-const goblinImg = new Image();
-goblinImg.src = "images/goblin.png";
-const dragonImg = new Image();
-dragonImg.src = "images/dragon.png";
 
 // 이벤트 리스너
 window.addEventListener("keydown", (e) => (keys[e.key] = true));
 window.addEventListener("keyup", (e) => (keys[e.key] = false));
 
-// 게임 스토리와 이벤트
-const storyEvents = [
-    { type: "story", text: "You begin your journey from a small village..." },
-    { type: "encounter", enemy: { name: "Slime", level: 1, hp: 50, img: slimeImg } },
-    { type: "story", text: "You continue your journey and face another enemy..." },
-    { type: "encounter", enemy: { name: "Goblin", level: 2, hp: 80, img: goblinImg } },
-    { type: "story", text: "You reach the mountain top, but a powerful enemy awaits..." },
-    { type: "encounter", enemy: { name: "Dragon", level: 5, hp: 150, img: dragonImg } }
-];
+// 가상 조이스틱 버튼 이벤트 리스너
+document.getElementById("upBtn").addEventListener("mousedown", () => (keys["ArrowUp"] = true));
+document.getElementById("downBtn").addEventListener("mousedown", () => (keys["ArrowDown"] = true));
+document.getElementById("leftBtn").addEventListener("mousedown", () => (keys["ArrowLeft"] = true));
+document.getElementById("rightBtn").addEventListener("mousedown", () => (keys["ArrowRight"] = true));
+
+document.getElementById("upBtn").addEventListener("mouseup", () => (keys["ArrowUp"] = false));
+document.getElementById("downBtn").addEventListener("mouseup", () => (keys["ArrowDown"] = false));
+document.getElementById("leftBtn").addEventListener("mouseup", () => (keys["ArrowLeft"] = false));
+document.getElementById("rightBtn").addEventListener("mouseup", () => (keys["ArrowRight"] = false));
 
 // 게임 루프
 function gameLoop() {
