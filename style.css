@@ -1,28 +1,28 @@
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #222;
-    color: white;
-    font-family: Arial, sans-serif;
-}
-
-#gameCanvas {
-    background-color: #333;
-    border: 2px solid #fff;
-    display: block;
-    margin-bottom: 10px;
-}
-
-#battleUI {
-    text-align: center;
-}
-
-button {
-    margin: 5px;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undertale-style RPG Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game">
+        <canvas id="gameCanvas"></canvas>
+        <div id="joystick">
+            <button id="upBtn">▲</button>
+            <button id="leftBtn">◀</button>
+            <button id="downBtn">▼</button>
+            <button id="rightBtn">▶</button>
+        </div>
+        <div id="battleUI" style="display: none;">
+            <p id="message"></p>
+            <button id="attackBtn">Attack</button>
+            <button id="defendBtn">Defend</button>
+            <button id="talkBtn">Talk</button>
+            <button id="runBtn">Run</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
