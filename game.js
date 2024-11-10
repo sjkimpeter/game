@@ -1,138 +1,167 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+let playerHp = 100;
+let playerLevel = 1;
+let playerExp = 0;
+let playerDefense = false;
+let enemyHp = 50;
+let isPlayerTurn = true;
+let items = 2;  // 초기 아이템 개수
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const canvas = document.getElementById("battleCanvas");
+const ctx = canvas.getContext("2d");
 
-let player = {
-    x: 100,
-    y: 100,
-    width: 30,
-    height: 30,
-    color: 'blue',
-    speed: 3,
-    hp: 100,
-    level: 1,
-    exp: 0,
-};
+// 캐릭터 이미지 로드
+const playerImg = new Image();
+playerImg.src = "images/player.png";
+const enemyImg = new Image();
+enemyImg.src = "images/enemy.png";
 
-let monsters = [];
-let monsterSpawnInterval = 2000; // 몬스터 생성 주기 (밀리초)
-let monsterMaxHP = 30;
-let touchDirection = null;
+// 캐릭터 위치
+const playerPosition = { x: 50, y: 100 };
+const enemyPosition = { x: 300, y: 100 };
 
-function spawnMonster() {
-    let monster = {
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        width: 20,
-        height: 20,
-        color: 'red',
-        hp: monsterMaxHP,
-    };
-    monsters.push(monster);
+// 이미지 로드 여부 확인
+let playerImgLoaded = false;
+let enemyImgLoaded = false;
+
+playerImg.onload = () => { playerImgLoaded = true; };
+enemyImg.onload = () => { enemyImgLoaded = true; };
+
+function updateStats() {
+    document.getElementById("playerHp").textContent = playerHp;
+    document.getElementById("playerLevel").textContent = playerLevel;
+    document.getElementById("enemyHp").textContent = enemyHp;
 }
 
-function movePlayer() {
-    if (keys['ArrowUp'] || touchDirection === 'up') player.y -= player.speed;
-    if (keys['ArrowDown'] || touchDirection === 'down') player.y += player.speed;
-    if (keys['ArrowLeft'] || touchDirection === 'left') player.x -= player.speed;
-    if (keys['ArrowRight'] || touchDirection === 'right') player.x += player.speed;
-
-    // 화면 경계를 넘지 않도록
-    player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
-    player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+function displayMessage(message) {
+    document.getElementById("message").textContent = message;
 }
 
-function checkCollision() {
-    monsters.forEach((monster, index) => {
-        if (
-            player.x < monster.x + monster.width &&
-            player.x + player.width > monster.x &&
-            player.y < monster.y + monster.height &&
-            player.y + player.height > monster.y
-        ) {
-            monster.hp -= 10; // 몬스터 체력 감소
-            if (monster.hp <= 0) {
-                monsters.splice(index, 1); // 몬스터 제거
-                player.exp += 10; // 경험치 획득
-                checkLevelUp();
-            }
-        }
-    });
-}
-
-function checkLevelUp() {
-    if (player.exp >= player.level * 20) {
-        player.level += 1;
-        player.exp = 0;
-        player.hp += 20; // 체력 증가
-        player.speed += 0.5; // 속도 증가
-        monsterMaxHP += 10; // 몬스터 체력 증가
-        console.log(`Level Up! Level: ${player.level}`);
+function attack() {
+    if (isPlayerTurn) {
+        const damage = Math.floor(Math.random() * 10) + 5;
+        enemyHp -= damage;
+        displayMessage(`You attack the enemy for ${damage} damage!`);
+        isPlayerTurn = false;
+        checkGameOver();
+        setTimeout(enemyTurn, 1000);
     }
 }
 
-function drawPlayer() {
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+function defend() {
+    if (isPlayerTurn) {
+        displayMessage("You prepare to defend the next attack!");
+        playerDefense = true;
+        isPlayerTurn = false;
+        setTimeout(enemyTurn, 1000);
+    }
 }
 
-function drawMonsters() {
-    monsters.forEach((monster) => {
-        ctx.fillStyle = monster.color;
-        ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
+function talk() {
+    if (isPlayerTurn) {
+        displayMessage("You try to talk to the enemy...");
+        const response = Math.random();
+        if (response < 0.3) {
+            displayMessage("The enemy seems hesitant.");
+            enemyHp -= 5; // 대화로 적에게 약간의 피해를 줌
+        } else if (response < 0.6) {
+            displayMessage("The enemy ignores you.");
+        } else {
+            displayMessage("The enemy appears confused.");
+        }
+        isPlayerTurn = false;
+        checkGameOver();
+        setTimeout(enemyTurn, 1000);
+    }
+}
+
+function useItem() {
+    if (isPlayerTurn && items > 0) {
+        playerHp = Math.min(playerHp + 20, 100);  // HP 최대치를 넘지 않도록
+        items--;
+        displayMessage("You use a healing item and restore 20 HP.");
+        updateStats();
+        isPlayerTurn = false;
+        setTimeout(enemyTurn, 1000);
+    } else if (items <= 0) {
+        displayMessage("No items left!");
+    }
+}
+
+function enemyTurn() {
+    if (enemyHp > 0) {
+        const action = Math.random();
+        if (action < 0.7) {
+            let damage = Math.floor(Math.random() * 10) + 5;
+            if (playerDefense) {
+                damage = Math.floor(damage / 2);  // 방어 시 피해 반감
+                playerDefense = false;
+                displayMessage(`The enemy attacks, but you defend and take only ${damage} damage!`);
+            } else {
+                displayMessage(`The enemy attacks you for ${damage} damage!`);
+            }
+            playerHp -= damage;
+        } else {
+            displayMessage("The enemy is preparing for the next attack...");
+        }
+        checkGameOver();
+    }
+    isPlayerTurn = true;
+}
+
+function checkGameOver() {
+    updateStats();
+    if (playerHp <= 0) {
+        displayMessage("You have been defeated...");
+        disableActions();
+    } else if (enemyHp <= 0) {
+        displayMessage("You defeated the enemy!");
+        gainExp();
+    }
+}
+
+function disableActions() {
+    document.querySelectorAll("#actions button").forEach(button => {
+        button.disabled = true;
     });
 }
 
-function drawHUD() {
-    ctx.fillStyle = 'white';
-    ctx.font = '20px Arial';
-    ctx.fillText(`HP: ${player.hp}`, 10, 20);
-    ctx.fillText(`Level: ${player.level}`, 10, 40);
-    ctx.fillText(`EXP: ${player.exp}`, 10, 60);
+function gainExp() {
+    playerExp += 10;
+    if (playerExp >= playerLevel * 20) {
+        playerLevel++;
+        playerExp = 0;
+        playerHp = Math.min(playerHp + 20, 100); // 레벨업 시 체력 회복
+        enemyHp = 50 + playerLevel * 10;  // 새로운 적 체력 증가
+        displayMessage(`You leveled up! Now at level ${playerLevel}.`);
+        updateStats();
+        isPlayerTurn = true;
+    }
+}
+
+function drawCharacters() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 플레이어 이미지 또는 기본 사각형
+    if (playerImgLoaded) {
+        ctx.drawImage(playerImg, playerPosition.x, playerPosition.y, 64, 64);
+    } else {
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(playerPosition.x, playerPosition.y, 64, 64);
+    }
+
+    // 적 이미지 또는 기본 사각형
+    if (enemyImgLoaded) {
+        ctx.drawImage(enemyImg, enemyPosition.x, enemyPosition.y, 64, 64);
+    } else {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(enemyPosition.x, enemyPosition.y, 64, 64);
+    }
 }
 
 function gameLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    movePlayer();
-    checkCollision();
-
-    drawPlayer();
-    drawMonsters();
-    drawHUD();
-
+    drawCharacters();
     requestAnimationFrame(gameLoop);
 }
 
-let keys = {};
-window.addEventListener('keydown', (e) => keys[e.key] = true);
-window.addEventListener('keyup', (e) => keys[e.key] = false);
-
-// 주기적으로 몬스터 생성
-setInterval(spawnMonster, monsterSpawnInterval);
-
-// 터치 이벤트 추가
-canvas.addEventListener('touchstart', (e) => {
-    const touchX = e.touches[0].clientX;
-    const touchY = e.touches[0].clientY;
-
-    // 화면의 네 영역을 기준으로 방향을 설정
-    if (touchX < canvas.width / 3) {
-        touchDirection = 'left';
-    } else if (touchX > canvas.width * 2 / 3) {
-        touchDirection = 'right';
-    } else if (touchY < canvas.height / 3) {
-        touchDirection = 'up';
-    } else if (touchY > canvas.height * 2 / 3) {
-        touchDirection = 'down';
-    }
-});
-
-canvas.addEventListener('touchend', () => {
-    touchDirection = null; // 터치가 끝나면 방향 초기화
-});
-
-// 게임 루프 시작
+updateStats();
 gameLoop();
