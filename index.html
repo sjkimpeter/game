@@ -3,14 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple RPG Game</title>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { background-color: #222; display: block; margin: 0 auto; }
-    </style>
+    <title>Advanced RPG Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
+    <div id="game">
+        <div id="battle">
+            <div id="player">
+                <h2>Player</h2>
+                <p>HP: <span id="playerHp">100</span></p>
+                <p>Level: <span id="playerLevel">1</span></p>
+            </div>
+            <div id="enemy">
+                <h2>Enemy</h2>
+                <p>HP: <span id="enemyHp">50</span></p>
+            </div>
+        </div>
+        <div id="actions">
+            <button onclick="attack()">Attack</button>
+            <button onclick="defend()">Defend</button>
+            <button onclick="talk()">Talk</button>
+            <button onclick="useItem()">Use Item</button>
+        </div>
+        <div id="message"></div>
+        <canvas id="battleCanvas" width="400" height="200"></canvas>
+    </div>
     <script src="game.js"></script>
 </body>
 </html>
