@@ -3,36 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced RPG Game</title>
+    <title>Undertale-style RPG Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="languageSelect">
-        <button onclick="setLanguage('en')">English</button>
-        <button onclick="setLanguage('ko')">한국어</button>
-    </div>
     <div id="game">
-        <div id="story" style="display: none;"></div>
-        <div id="battle">
-            <div id="player">
-                <h2>Player</h2>
-                <p>HP: <span id="playerHp">100</span></p>
-                <p>Level: <span id="playerLevel">1</span></p>
-            </div>
-            <div id="enemy">
-                <h2>Enemy</h2>
-                <p>HP: <span id="enemyHp">50</span></p>
-            </div>
+        <canvas id="gameCanvas"></canvas>
+        <div id="battleUI" style="display: none;">
+            <p id="message"></p>
+            <button id="attackBtn">Attack</button>
+            <button id="defendBtn">Defend</button>
+            <button id="talkBtn">Talk</button>
+            <button id="runBtn">Run</button>
         </div>
-        <div id="actions">
-            <button onclick="attack()">Attack</button>
-            <button onclick="defend()">Defend</button>
-            <button onclick="talk()">Talk</button>
-            <button onclick="run()">Run</button>
-            <button onclick="useItem()">Use Item</button>
-        </div>
-        <div id="message"></div>
-        <canvas id="battleCanvas" width="400" height="200"></canvas>
     </div>
     <script src="game.js"></script>
 </body>
