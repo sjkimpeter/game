@@ -1,28 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Undertale-style RPG Game</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="game">
-        <canvas id="gameCanvas"></canvas>
-        <div id="joystick">
-            <button id="upBtn">▲</button>
-            <button id="leftBtn">◀</button>
-            <button id="downBtn">▼</button>
-            <button id="rightBtn">▶</button>
-        </div>
-        <div id="battleUI" style="display: none;">
-            <p id="message"></p>
-            <button id="attackBtn">Attack</button>
-            <button id="defendBtn">Defend</button>
-            <button id="talkBtn">Talk</button>
-            <button id="runBtn">Run</button>
-        </div>
-    </div>
-    <script src="game.js"></script>
-</body>
-</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #222;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+#gameCanvas {
+    background-color: #333;
+    border: 2px solid #fff;
+    display: block;
+    margin-bottom: 10px;
+}
+
+#battleUI {
+    text-align: center;
+}
+
+button {
+    margin: 5px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#joystick {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: grid;
+    grid-template-columns: 50px 50px 50px;
+    grid-template-rows: 50px 50px;
+}
+
+#joystick button {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    margin: 2px;
+    background-color: #444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+#joystick #upBtn { grid-column: 2; }
+#joystick #leftBtn { grid-column: 1; grid-row: 2; }
+#joystick #downBtn { grid-column: 2; grid-row: 2; }
+#joystick #rightBtn { grid-column: 3; grid-row: 2; }
