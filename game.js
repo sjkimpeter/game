@@ -11,29 +11,42 @@ let playerPath = "neutral";  // "peaceful", "aggressive", "neutral"
 let messages = [];
 let currentStoryIndex = 0;
 
-// 키 입력 상태
-const keys = {};
+// 키 입력 상태 및 가상 조이스틱
+const keys = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false
+};
 
-// 이미지
-const playerImg = new Image();
-playerImg.src = "images/player.png";
-const slimeImg = new Image();
-slimeImg.src = "images/slime.png";
+// 조이스틱 버튼 설정
+const joystickButtons = [
+    { element: document.getElementById("upBtn"), key: "ArrowUp" },
+    { element: document.getElementById("downBtn"), key: "ArrowDown" },
+    { element: document.getElementById("leftBtn"), key: "ArrowLeft" },
+    { element: document.getElementById("rightBtn"), key: "ArrowRight" }
+];
 
-// 이벤트 리스너
-window.addEventListener("keydown", (e) => (keys[e.key] = true));
-window.addEventListener("keyup", (e) => (keys[e.key] = false));
+joystickButtons.forEach(({ element, key }) => {
+    element.addEventListener("mousedown", () => keys[key] = true);
+    element.addEventListener("mouseup", () => keys[key] = false);
+    element.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        keys[key] = true;
+    });
+    element.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        keys[key] = false;
+    });
+});
 
-// 가상 조이스틱 버튼 이벤트 리스너
-document.getElementById("upBtn").addEventListener("mousedown", () => (keys["ArrowUp"] = true));
-document.getElementById("downBtn").addEventListener("mousedown", () => (keys["ArrowDown"] = true));
-document.getElementById("leftBtn").addEventListener("mousedown", () => (keys["ArrowLeft"] = true));
-document.getElementById("rightBtn").addEventListener("mousedown", () => (keys["ArrowRight"] = true));
-
-document.getElementById("upBtn").addEventListener("mouseup", () => (keys["ArrowUp"] = false));
-document.getElementById("downBtn").addEventListener("mouseup", () => (keys["ArrowDown"] = false));
-document.getElementById("leftBtn").addEventListener("mouseup", () => (keys["ArrowLeft"] = false));
-document.getElementById("rightBtn").addEventListener("mouseup", () => (keys["ArrowRight"] = false));
+// 키보드 입력 이벤트 리스너
+window.addEventListener("keydown", (e) => {
+    if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+});
+window.addEventListener("keyup", (e) => {
+    if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
+});
 
 // 게임 루프
 function gameLoop() {
@@ -55,6 +68,10 @@ function updateExploreMode() {
     if (keys["ArrowDown"]) player.y += 2;
     if (keys["ArrowLeft"]) player.x -= 2;
     if (keys["ArrowRight"]) player.x += 2;
+
+    // 화면 경계를 벗어나지 않도록 제한
+    player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+    player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
 
     // 플레이어가 적과 충돌하면 전투 시작
     if (
@@ -92,19 +109,11 @@ function drawBattleMode() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (playerImg.complete) {
-        ctx.drawImage(playerImg, 50, 100, player.width, player.height);
-    } else {
-        ctx.fillStyle = "blue";
-        ctx.fillRect(50, 100, player.width, player.height);
-    }
+    ctx.fillStyle = "blue";
+    ctx.fillRect(50, 100, player.width, player.height);
 
-    if (enemy.img && enemy.img.complete) {
-        ctx.drawImage(enemy.img, 300, 100, enemy.width, enemy.height);
-    } else {
-        ctx.fillStyle = "red";
-        ctx.fillRect(300, 100, enemy.width, enemy.height);
-    }
+    ctx.fillStyle = "red";
+    ctx.fillRect(300, 100, enemy.width, enemy.height);
 }
 
 // 플레이어 공격
