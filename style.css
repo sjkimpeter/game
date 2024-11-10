@@ -3,35 +3,26 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: black;
+    margin: 0;
+    background-color: #222;
     color: white;
     font-family: Arial, sans-serif;
-    margin: 0;
 }
 
-#game {
+#gameCanvas {
+    background-color: #333;
+    border: 2px solid #fff;
+    display: block;
+    margin-bottom: 10px;
+}
+
+#battleUI {
     text-align: center;
 }
 
-#battle {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
-}
-
-#actions button {
-    margin: 10px;
-    padding: 10px 20px;
+button {
+    margin: 5px;
+    padding: 10px;
     font-size: 16px;
-}
-
-#message {
-    margin-top: 20px;
-    font-size: 18px;
-}
-
-#battleCanvas {
-    margin-top: 20px;
-    background-color: #333;
-    border: 1px solid #fff;
+    cursor: pointer;
 }
